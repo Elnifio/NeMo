@@ -100,6 +100,7 @@ def init_parallel_ranks(
         use_te_rng_tracker=getattr(parallel_config, "use_te_rng_tracker", False),
         use_tp_pp_dp_mapping=getattr(parallel_config, "use_tp_pp_dp_mapping", False),
         # apex_transformer_log_level=self.cfg.get('apex_transformer_log_level', 30),
+        nccl_communicator_config_path=getattr(parallel_config, "nccl_communicator_config_path", None),
     )
 
 
@@ -131,6 +132,7 @@ def init_model_parallel(model: Optional[nn.Module] = None) -> None:
                 expert_tensor_parallel_size=app_state.expert_tensor_parallel_size,
                 order="tp-ep-pp-cp-dp" if app_state.use_tp_pp_dp_mapping else "tp-cp-ep-dp-pp",
                 use_sharp=os.environ.get("USE_SHARP", "false").lower() == "true",
+                nccl_communicator_config_path=app_state.nccl_communicator_config_path,
             )
 
             # assert that fake tp and pp rank match after model parallel init

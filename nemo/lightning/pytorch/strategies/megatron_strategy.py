@@ -130,6 +130,7 @@ class ParallelismConfig:
     use_te_rng_tracker: bool = False
     expert_tensor_parallel_size: int = None
     use_tp_pp_dp_mapping: bool = False
+    nccl_communicator_config_path: str = None
 
 
 class MegatronStrategy(DDPStrategy, io.IOMixin):
@@ -269,6 +270,7 @@ class MegatronStrategy(DDPStrategy, io.IOMixin):
         restore_config: Optional[RestoreConfig] = None,
         megatron_log_level: int = 0,
         use_tp_pp_dp_mapping: bool = False,
+        nccl_communicator_config_path: str = None,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -311,6 +313,7 @@ class MegatronStrategy(DDPStrategy, io.IOMixin):
         self.log_train_loss = bool(int(os.getenv("NEMO_LOG_TRAIN_LOSS", 1)))
         self.log_memory_usage = bool(int(os.getenv("NEMO_LOG_MEMORY_USAGE", 0)))
         self.use_tp_pp_dp_mapping = use_tp_pp_dp_mapping
+        self.nccl_communicator_config_path = nccl_communicator_config_path
         self.save_ckpt_format = save_ckpt_format
         self.async_save = ckpt_async_save
         self.torch_dist_multiproc = ckpt_torch_dist_multiproc
@@ -1119,6 +1122,7 @@ class MegatronStrategy(DDPStrategy, io.IOMixin):
             pipeline_dtype=self.pipeline_dtype,
             use_te_rng_tracker=self.use_te_rng_tracker,
             use_tp_pp_dp_mapping=self.use_tp_pp_dp_mapping,
+            nccl_communicator_config_path=self.nccl_communicator_config_path,
         )
 
     @contextmanager
