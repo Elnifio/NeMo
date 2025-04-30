@@ -118,6 +118,7 @@ def init_model_parallel(model: Optional[nn.Module] = None) -> None:
         # destroy groups in case they have already been created
         # this happens with multiple calls to trainer.test for example
         parallel_state.destroy_model_parallel()
+        nccl_comm_config_path = os.environ.get("CUSTOM_NCCL_COMM_CONFIG_PATH", None)
         if torch.distributed.is_initialized():
             parallel_state.initialize_model_parallel(
                 tensor_model_parallel_size=app_state.tensor_model_parallel_size,
@@ -131,6 +132,7 @@ def init_model_parallel(model: Optional[nn.Module] = None) -> None:
                 expert_tensor_parallel_size=app_state.expert_tensor_parallel_size,
                 order="tp-ep-pp-cp-dp" if app_state.use_tp_pp_dp_mapping else "tp-cp-ep-dp-pp",
                 use_sharp=os.environ.get("USE_SHARP", "false").lower() == "true",
+                nccl_communicator_config_path=nccl_comm_config_path
             )
 
             # assert that fake tp and pp rank match after model parallel init
